@@ -10,33 +10,24 @@ const signUpUser = async (userName, password) => {
     await pool.query(`INSERT INTO credential (username,password)
     VALUES ('${userName}','${hashPass}')`);
 
+    await pool.query(`INSERT INTO users (username) VALUES ('${userName}') `);
+
     const user = await pool.query(
-      `INSERT INTO users (username) VALUES ('${userName}') `
+      `SELECT * FROM users WHERE username = '${userName}'`
     );
 
-    return user;
+    return user.rows[0];
   } catch (error) {
     throw error;
   }
 };
 
-const signInUser = async (username, password, token) => {
+const signInUser = async (username, password) => {
   try {
     const user = await pool.query(
       `SELECT * FROM credential WHERE username = '${username}'`
     );
-    const isLoginSuccess = await bcrypt.compare(
-      password,
-      user.rows[0].password
-    );
-
-    if (!isLoginSuccess) {
-      throw false;
-    }
-
-    await pool.query(
-      `UPDATE credential SET  refresh_token='${token}' WHERE username = '${username}'`
-    );
+    await bcrypt.compare(password, user.rows[0].password);
 
     return user.rows[0];
   } catch (error) {
