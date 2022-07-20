@@ -1,6 +1,8 @@
 const express = require("express");
+const dotenv = require("dotenv");
+dotenv.config();
 
-const userApi = require("./router/api/user");
+const authApi = require("./router/api/auth");
 
 const app = express();
 
@@ -11,5 +13,5 @@ app.get("/", (req, res) => {
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-app.use("/api/user/", userApi);
+app.use("/api/auth/", authApi);
 module.exports = app;
