@@ -1,0 +1,21 @@
+{
+  "name": "sa-forum-back",
+  "version": "1.0.0",
+  "description": "api saforum app, the forum to gather people who have same interest communicate",
+  "main": "app.js",
+  "author": "Feri Teja Kusuma",
+  "license": "MIT",
+  "scripts": {
+    "dev": "nodemon app.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.1",
+    "express": "^4.18.1",
+    "jest": "^28.1.3",
+    "pg": "^8.7.3",
+    "validator": "^13.7.0"
+  },
+  "devDependencies": {
+    "supertest": "^6.2.4"
+  }
+}
