@@ -6,9 +6,11 @@
   "author": "Feri Teja Kusuma",
   "license": "MIT",
   "scripts": {
-    "dev": "nodemon app.js"
+    "dev": "nodemon server.js",
+    "test": "jest --detectOpenHandles"
   },
   "dependencies": {
+    "bcrypt": "^5.0.1",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
     "jest": "^28.1.3",
