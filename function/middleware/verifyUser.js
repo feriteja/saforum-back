@@ -29,4 +29,14 @@ const verifyUser = async (req, res, next) => {
   }
 };
 
-module.exports = { verifyUser };
+const verifyAdmin = async (req, res, next) => {
+  try {
+    const isAdmin = req.user.role === "ADMIN";
+    if (!isAdmin) return res.status(401).json({ message: "you are not admin" });
+    next();
+  } catch (error) {
+    throw error;
+  }
+};
+
+module.exports = { verifyUser, verifyAdmin };
