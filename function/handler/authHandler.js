@@ -24,12 +24,16 @@ const signUpUser = async (userName, password) => {
 
 const signInUser = async (username, password) => {
   try {
-    const user = await pool.query(
+    const userCred = await pool.query(
       `SELECT * FROM credential WHERE username = '${username}'`
     );
-    const isUser = await bcrypt.compare(password, user.rows[0].password);
+    const isUser = await bcrypt.compare(password, userCred.rows[0].password);
 
     if (!isUser) throw false;
+
+    const user = await pool.query(
+      `SELECT * FROM users WHERE username = '${username}'`
+    );
 
     return user.rows[0];
   } catch (error) {
