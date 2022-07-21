@@ -51,8 +51,12 @@ const updateForum = async (data) => {
     const res = await pool.query(
       `UPDATE forum SET title='${data.title}', content='${data.content}'   WHERE fuid = '${data.forumID}' `
     );
+    console.log(res);
     return res.rowCount;
-  } catch (error) {}
+  } catch (error) {
+    console.log("error update", error);
+    throw error;
+  }
 };
 
 module.exports = {
