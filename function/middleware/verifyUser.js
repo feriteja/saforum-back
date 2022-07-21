@@ -25,7 +25,7 @@ const verifyUser = async (req, res, next) => {
 
     next();
   } catch (error) {
-    res.sendStatus(404);
+    res.sendStatus(401);
   }
 };
 

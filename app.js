@@ -6,6 +6,7 @@ dotenv.config();
 
 const authApi = require("./router/api/auth");
 const userApi = require("./router/api/user");
+const forumApi = require("./router/api/forum");
 
 const app = express();
 
@@ -20,6 +21,6 @@ app.use(express.json());
 
 app.use("/api/auth/", authApi);
 app.use("/api/user/", userApi);
-app.use("/api/forum/", userApi);
+app.use("/api/forum/", forumApi);
 
 module.exports = app;
