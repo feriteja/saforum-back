@@ -35,4 +35,17 @@ const signInUser = async (username, password) => {
   }
 };
 
-module.exports = { signUpUser, signInUser };
+const signOutUser = async (username) => {
+  try {
+    const res = await pool.query(
+      `UPDATE credential SET  refresh_token = null WHERE username = '${username}'`
+    );
+
+    return res;
+  } catch (error) {
+    console.log("errorsignout", error);
+    throw error;
+  }
+};
+
+module.exports = { signUpUser, signInUser, signOutUser };

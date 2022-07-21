@@ -4,8 +4,10 @@ const pool = require("../../db.config");
 const {
   signUpUser,
   signInUser,
-} = require("../../function/handler/userHandler");
-const { generateToken } = require("../../function/middleware/tokenGenerator");
+  signOutUser,
+} = require("../../function/handler/authHandler");
+const { generateToken } = require("../../function/handler/tokenGenerator");
+const { verifyUser } = require("../../function/middleware/verifyUser");
 
 const router = express.Router();
 
@@ -36,6 +38,15 @@ router.post("/signIn", async (req, res) => {
     res.status(200).json({ message: "success", token });
   } catch (error) {
     res.status(401).json({ message: "incorect email/password" });
+  }
+});
+
+router.post("/signOut", verifyUser, async (req, res) => {
+  try {
+    await signOutUser(req.user.username);
+    res.sendStatus(204);
+  } catch (error) {
+    res.status(401).json({ message: "something wrong" });
   }
 });
 
