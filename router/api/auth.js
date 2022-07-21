@@ -18,6 +18,9 @@ router.post("/signUp", async (req, res) => {
     const user = await signUpUser(username, password);
 
     const token = await generateToken(user);
+    await pool.query(
+      `UPDATE credential SET  refresh_token='${token.refresh_token}' WHERE username = '${username}'`
+    );
 
     return res.status(201).json({ message: "user has been registered", token });
   } catch (error) {
