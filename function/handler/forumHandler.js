@@ -1,5 +1,29 @@
 const pool = require("../../db.config");
 
+const getAllForums = async () => {
+  try {
+    const forum = await pool.query(
+      `SELECT fuid, title, content, owner, created_at, category, like_count FROM forum`
+    );
+
+    return forum.rows;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const getForumDetail = async (forumID) => {
+  try {
+    const forum = await pool.query(
+      `SELECT * FROM forum WHERE fuid = '${forumID}'`
+    );
+
+    return forum.rows[0];
+  } catch (error) {
+    throw error;
+  }
+};
+
 const addForum = async (userID, data) => {
   try {
     const content = data.content.replace(/'/g, "''");
@@ -22,4 +46,19 @@ const deleteForum = async (forumID) => {
   }
 };
 
-module.exports = { addForum, deleteForum };
+const updateForum = async (data) => {
+  try {
+    const res = await pool.query(
+      `UPDATE forum SET title='${data.title}', content='${data.content}'   WHERE fuid = '${data.forumID}' `
+    );
+    return res.rowCount;
+  } catch (error) {}
+};
+
+module.exports = {
+  addForum,
+  deleteForum,
+  getAllForums,
+  getForumDetail,
+  updateForum,
+};
