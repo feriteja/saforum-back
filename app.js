@@ -20,4 +20,6 @@ app.use(express.json());
 
 app.use("/api/auth/", authApi);
 app.use("/api/user/", userApi);
+app.use("/api/forum/", userApi);
+
 module.exports = app;
