@@ -7,8 +7,9 @@ const getAllForums = async (category) => {
         `SELECT fuid, title, content,  users.username AS owner, forum.created_at, category, like_count
         FROM users
         JOIN forum ON  forum.owner=users.uuid 
-        WHERE category='${category}'
-`
+        WHERE category = '${category}'
+        ORDER BY forum.created_at DESC
+        `
       );
       return forum.rows;
     }
@@ -16,7 +17,8 @@ const getAllForums = async (category) => {
     const forum = await pool.query(
       `SELECT fuid, title, content,  users.username AS owner, forum.created_at, category, like_count
       FROM users
-      JOIN forum ON  forum.owner=users.uuid `
+      JOIN forum ON  forum.owner=users.uuid 
+      ORDER BY forum.created_at DESC`
     );
 
     return forum.rows;
@@ -28,7 +30,10 @@ const getAllForums = async (category) => {
 const getForumDetail = async (forumID) => {
   try {
     const forum = await pool.query(
-      `SELECT * FROM forum WHERE fuid = '${forumID}'`
+      `SELECT forum.* , users.username  as owner
+      FROM forum  
+      JOIN users ON users.uuid=forum.owner 
+      WHERE fuid = '${forumID}'`
     );
 
     return forum.rows[0];

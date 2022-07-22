@@ -47,6 +47,7 @@ const signInUser = async (username, password) => {
 const signOutUser = async (username) => {
   try {
     username.replace(/'/g, "''");
+    console.log(username);
     const res = await pool.query(
       `UPDATE credential SET  refresh_token = null WHERE username = '${username}'`
     );

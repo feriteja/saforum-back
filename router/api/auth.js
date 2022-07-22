@@ -49,7 +49,7 @@ router.post("/signOut", verifyUser, async (req, res) => {
     await signOutUser(req.user.username);
     res.sendStatus(204);
   } catch (error) {
-    res.status(401).json({ message: "something wrong" });
+    res.status(403).json({ message: "something wrong" });
   }
 });
 
