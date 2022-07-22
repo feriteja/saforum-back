@@ -5,6 +5,7 @@ const {
   getAllForums,
   getForumDetail,
   updateForum,
+  commentForum,
 } = require("../../function/handler/forumHandler");
 
 const { verifyUser } = require("../../function/middleware/verifyUser");
@@ -77,6 +78,19 @@ router.put("/update", verifyUser, async (req, res) => {
   } catch (error) {
     res.status(400).json({ message: "failed to update forum" });
     throw error;
+  }
+});
+
+router.patch("/comment", verifyUser, async (req, res) => {
+  try {
+    const data = req.body;
+
+    const comment = await commentForum(data);
+    if (comment === 0) res.sendStatus(410);
+
+    res.sendStatus(201);
+  } catch (error) {
+    res.sendStatus(403);
   }
 });
 

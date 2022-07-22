@@ -30,7 +30,7 @@ const getAllForums = async (category) => {
 const getForumDetail = async (forumID) => {
   try {
     const forum = await pool.query(
-      `SELECT forum.* , users.username  as owner
+      `SELECT forum.* , users.username  AS owner
       FROM forum  
       JOIN users ON users.uuid=forum.owner 
       WHERE fuid = '${forumID}'`
@@ -78,10 +78,24 @@ const updateForum = async (data) => {
   }
 };
 
+const commentForum = async (data) => {
+  try {
+    const res = await pool.query(
+      `UPDATE forum SET comment= comment || '${data.comment}'::jsonb  WHERE fuid = '${data.forumID}' `
+    );
+
+    return res.rowCount;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
 module.exports = {
   addForum,
   deleteForum,
   getAllForums,
   getForumDetail,
   updateForum,
+  commentForum,
 };
