@@ -40,8 +40,9 @@ const getForumDetail = async (forumID) => {
 const addForum = async (userID, data) => {
   try {
     const content = data.content.replace(/'/g, "''");
+    const title = data.title.replace(/'/g, "''");
     const res = await pool.query(
-      `INSERT INTO forum (owner, title, content, category) VALUES ('${userID}', '${data.title}','${content}','${data.category}' )`
+      `INSERT INTO forum (owner, title, content, category) VALUES ('${userID}', '${title}','${content}','${data.category}' )`
     );
     return true;
   } catch (error) {

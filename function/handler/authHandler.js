@@ -6,6 +6,7 @@ const signUpUser = async (userName, password) => {
     const genSalt = await bcrypt.genSalt(10);
 
     const hashPass = await bcrypt.hash(password, genSalt);
+    userName.replace(/'/g, "''");
 
     await pool.query(`INSERT INTO credential (username,password)
     VALUES ('${userName}','${hashPass}')`);
@@ -24,6 +25,7 @@ const signUpUser = async (userName, password) => {
 
 const signInUser = async (username, password) => {
   try {
+    username.replace(/'/g, "''");
     const userCred = await pool.query(
       `SELECT * FROM credential WHERE username = '${username}'`
     );
@@ -44,6 +46,7 @@ const signInUser = async (username, password) => {
 
 const signOutUser = async (username) => {
   try {
+    username.replace(/'/g, "''");
     const res = await pool.query(
       `UPDATE credential SET  refresh_token = null WHERE username = '${username}'`
     );
