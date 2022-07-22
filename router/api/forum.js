@@ -12,7 +12,8 @@ const router = express.Router();
 
 router.get("/", async (req, res) => {
   try {
-    const forums = await getAllForums();
+    const category = req.body.category;
+    const forums = await getAllForums(category);
 
     return res.status(200).json({ message: "success", data: forums });
   } catch (error) {

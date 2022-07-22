@@ -1,9 +1,22 @@
 const pool = require("../../db.config");
 
-const getAllForums = async () => {
+const getAllForums = async (category) => {
   try {
+    if (category) {
+      const forum = await pool.query(
+        `SELECT fuid, title, content,  users.username AS owner, forum.created_at, category, like_count
+        FROM users
+        JOIN forum ON  forum.owner=users.uuid 
+        WHERE category='${category}'
+`
+      );
+      return forum.rows;
+    }
+
     const forum = await pool.query(
-      `SELECT fuid, title, content, owner, created_at, category, like_count FROM forum`
+      `SELECT fuid, title, content,  users.username AS owner, forum.created_at, category, like_count
+      FROM users
+      JOIN forum ON  forum.owner=users.uuid `
     );
 
     return forum.rows;
