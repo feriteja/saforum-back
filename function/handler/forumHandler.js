@@ -4,7 +4,7 @@ const getAllForums = async (category) => {
   try {
     if (category) {
       const forum = await pool.query(
-        `SELECT fuid, title, content,  users.username AS owner, forum.created_at, category, like_count
+        `SELECT fuid, title, content,  users.username AS owner, forum.created_at, category, like_count, cardinality(comment) AS comment
         FROM users
         JOIN forum ON  forum.owner=users.uuid 
         WHERE category = '${category}'
@@ -15,7 +15,7 @@ const getAllForums = async (category) => {
     }
 
     const forum = await pool.query(
-      `SELECT fuid, title, content,  users.username AS owner, forum.created_at, category, like_count
+      `SELECT fuid, title, content,  users.username AS owner, forum.created_at, category, like_count, comment
       FROM users
       JOIN forum ON  forum.owner=users.uuid 
       ORDER BY forum.created_at DESC`
