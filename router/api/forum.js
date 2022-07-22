@@ -83,7 +83,9 @@ router.put("/update", verifyUser, async (req, res) => {
 
 router.patch("/comment", verifyUser, async (req, res) => {
   try {
-    const data = req.body;
+    const commentData = req.body;
+    const user = req.user;
+    const data = { user, commentData };
 
     const comment = await commentForum(data);
     if (comment === 0) res.sendStatus(410);
