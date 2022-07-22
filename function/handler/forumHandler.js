@@ -78,10 +78,10 @@ const updateForum = async (data) => {
   }
 };
 
-const commentForum = async (data) => {
+const commentForum = async (data, forumID) => {
   try {
     const res = await pool.query(
-      `UPDATE forum SET comment= comment || '${data.comment}'::jsonb  WHERE fuid = '${data.forumID}' `
+      `UPDATE forum SET comment= comment || '${data}'::jsonb  WHERE fuid = '${forumID}' `
     );
 
     return res.rowCount;

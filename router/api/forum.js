@@ -1,3 +1,4 @@
+const { json } = require("express");
 const express = require("express");
 const {
   addForum,
@@ -83,12 +84,20 @@ router.put("/update", verifyUser, async (req, res) => {
 
 router.patch("/comment", verifyUser, async (req, res) => {
   try {
-    const commentData = req.body;
-    const user = req.user;
-    const data = { user, commentData };
+    const body = req.body;
+    const user = req.user.uuid;
+    const comment = body.comment.comment.replace(/'/g, "''");
 
-    const comment = await commentForum(data);
-    if (comment === 0) res.sendStatus(410);
+    const data = JSON.stringify({
+      user: user,
+      comment: comment,
+      created_at: body.comment.created_at,
+    });
+
+    console.log("data", data);
+
+    const isComment = await commentForum(data, body.forumID);
+    if (isComment === 0) res.sendStatus(410);
 
     res.sendStatus(201);
   } catch (error) {
