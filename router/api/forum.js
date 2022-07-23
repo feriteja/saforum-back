@@ -15,6 +15,7 @@ const router = express.Router();
 router.get("/", async (req, res) => {
   try {
     const category = req.body.category;
+
     const forums = await getAllForums(category);
 
     return res.status(200).json({ message: "success", data: forums });
@@ -89,12 +90,11 @@ router.patch("/comment", verifyUser, async (req, res) => {
     const comment = body.comment.comment.replace(/'/g, "''");
 
     const data = JSON.stringify({
+      id: user.slice(0, 8) + body.comment.created_at.slice(-13, -5),
       user: user,
       comment: comment,
       created_at: body.comment.created_at,
     });
-
-    console.log("data", data);
 
     const isComment = await commentForum(data, body.forumID);
     if (isComment === 0) res.sendStatus(410);
