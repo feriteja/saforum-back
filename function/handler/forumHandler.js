@@ -47,7 +47,6 @@ const getForumDetail = async (forumID) => {
       FROM forum
       WHERE fuid = '${forumID}'`
     );
-    console.log(forum);
 
     return forum.rows[0];
   } catch (error) {

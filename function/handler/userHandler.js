@@ -1,9 +1,20 @@
 const pool = require("../../db.config");
 
-const getUserDetail = async (userID) => {
+const getUserDetailByUid = async (userID) => {
   try {
     const user = await pool.query(
       `SELECT * FROM users WHERE uuid = '${userID}'`
+    );
+
+    return user.rows[0];
+  } catch (error) {
+    throw error;
+  }
+};
+const getUserDetailByUsername = async (username) => {
+  try {
+    const user = await pool.query(
+      `SELECT * FROM users WHERE username = '${username}'`
     );
 
     return user.rows[0];
@@ -44,4 +55,9 @@ const getAllUser = async () => {
   }
 };
 
-module.exports = { getUserDetail, updateUser, getAllUser };
+module.exports = {
+  getUserDetailByUid,
+  updateUser,
+  getAllUser,
+  getUserDetailByUsername,
+};

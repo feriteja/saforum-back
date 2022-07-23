@@ -1,10 +1,9 @@
 const express = require("express");
 const {
-  signUpUser,
-  signInUser,
-  getUserDetail,
   updateUser,
   getAllUser,
+  getUserDetailByUid,
+  getUserDetailByUsername,
 } = require("../../function/handler/userHandler");
 const {
   verifyUser,
@@ -39,15 +38,18 @@ router.put("/", verifyUser, async (req, res) => {
   }
 });
 
-router.get("/detail", async (req, res) => {
+router.get("/detail/:username", async (req, res) => {
   try {
-    const { userID } = req.query;
+    const username = req.params.username;
 
-    const user = await getUserDetail(userID);
+    const user = await getUserDetailByUsername(username);
 
-    res.json({ message: "user exist", user });
+    if (!user) return res.status(404).json({ message: "user not found" });
+
+    return res.status(200).json({ message: "user exist", user });
   } catch (error) {
     res.status(404).json({ message: "user not found" });
+    throw error;
   }
 });
 

@@ -33,7 +33,6 @@ router.get("/s/:forumID", async (req, res) => {
 
     return res.status(200).json({ message: "success", data: forum });
   } catch (error) {
-    console.log(error);
     res.sendStatus(404);
   }
 });
@@ -88,6 +87,7 @@ router.put("/update", verifyUser, async (req, res) => {
 router.patch("/comment", verifyUser, async (req, res) => {
   try {
     const body = req.body;
+
     const user = req.user.uuid;
     const comment = body.comment.comment.replace(/'/g, "''");
 
