@@ -28,10 +28,12 @@ router.get("/", async (req, res) => {
 router.get("/s/:forumID", async (req, res) => {
   try {
     const forumID = req.params.forumID;
+
     const forum = await getForumDetail(forumID);
 
     return res.status(200).json({ message: "success", data: forum });
   } catch (error) {
+    console.log(error);
     res.sendStatus(404);
   }
 });
