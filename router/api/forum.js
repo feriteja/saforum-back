@@ -101,6 +101,7 @@ router.patch("/comment", verifyUser, async (req, res) => {
 
     res.sendStatus(201);
   } catch (error) {
+    console.log(error);
     res.sendStatus(403);
   }
 });

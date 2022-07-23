@@ -4,7 +4,7 @@ const getAllForums = async (category) => {
   try {
     if (category) {
       const forum = await pool.query(
-        `SELECT fuid, title, content,  users.username AS owner, forum.created_at, category, like_count, cardinality(comment) AS comment
+        `SELECT fuid, title, content,  users.username AS owner, forum.created_at, category, like_count, jsonb_array_length(comment) AS comment
         FROM users
         JOIN forum ON  forum.owner=users.uuid 
         WHERE category = '${category}'
@@ -15,7 +15,7 @@ const getAllForums = async (category) => {
     }
 
     const forum = await pool.query(
-      `SELECT fuid, title, content,  users.username AS owner, forum.created_at, category, like_count, cardinality(comment) AS comment
+      `SELECT fuid, title, content,  users.username AS owner, forum.created_at, category, like_count, jsonb_array_length(comment) AS comment
       FROM users
       JOIN forum ON  forum.owner=users.uuid 
       ORDER BY forum.created_at DESC`
@@ -38,6 +38,7 @@ const getForumDetail = async (forumID) => {
 
     return forum.rows[0];
   } catch (error) {
+    console.log(error);
     throw error;
   }
 };
@@ -81,8 +82,10 @@ const updateForum = async (data) => {
 const commentForum = async (data, forumID) => {
   try {
     const res = await pool.query(
-      `UPDATE forum SET comment= comment || '${data}'::jsonb  WHERE fuid = '${forumID}' `
+      `UPDATE forum SET comment= COALESCE(comment,'[]'::jsonb)|| '${data}'::jsonb  WHERE fuid = '${forumID}' `
     );
+
+    console.log(res);
 
     return res.rowCount;
   } catch (error) {
