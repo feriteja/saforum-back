@@ -87,15 +87,16 @@ router.put("/update", verifyUser, async (req, res) => {
 router.patch("/comment", verifyUser, async (req, res) => {
   try {
     const body = req.body;
+    const date = new Date();
 
     const user = req.user.uuid;
-    const comment = body.comment.comment.replace(/'/g, "''");
+    const comment = body.comment.replace(/'/g, "''");
 
     const data = JSON.stringify({
-      id: user.slice(0, 8) + body.comment.created_at.slice(-13, -5),
+      id: user.slice(0, 8) + date.toLocaleTimeString() + comment.slice(2, 3),
       user: user,
       comment: comment,
-      created_at: body.comment.created_at,
+      created_at: date,
     });
 
     const isComment = await commentForum(data, body.forumID);

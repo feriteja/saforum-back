@@ -97,8 +97,6 @@ const commentForum = async (data, forumID) => {
       `UPDATE forum SET comment= COALESCE(comment,'[]'::jsonb)|| '${data}'::jsonb  WHERE fuid = '${forumID}' `
     );
 
-    console.log(res);
-
     return res.rowCount;
   } catch (error) {
     console.log(error);
