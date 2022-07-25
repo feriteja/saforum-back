@@ -5,13 +5,16 @@ const {
   getUserDetailByUid,
   getUserDetailByUsername,
 } = require("../../function/handler/userHandler");
+const { upload } = require("../../function/middleware/multer");
 const {
   verifyUser,
   verifyAdmin,
 } = require("../../function/middleware/verifyUser");
+const fs = require("fs");
+const { deleteFile, moveFile } = require("../../function/utils/fileHandler");
 const router = express.Router();
 
-//! ADMIN ONLY
+//! ADMIN ONLY get all user
 router.get("/", verifyUser, verifyAdmin, async (req, res) => {
   try {
     const user = await getAllUser();
@@ -22,13 +25,21 @@ router.get("/", verifyUser, verifyAdmin, async (req, res) => {
   }
 });
 
-router.put("/", verifyUser, async (req, res) => {
+router.put("/", upload.single("avatar"), verifyUser, async (req, res) => {
   try {
-    const data = req.body;
-    const userID = req.user.uuid;
+    const file = req.file;
 
-    const isUpdated = await updateUser(userID, data);
-    if (isUpdated === 0) return res.sendStatus(404);
+    const body = req.body;
+    const userID = req.user.uuid;
+    body.avatar = file && file.filename;
+
+    const isUpdated = await updateUser(userID, body);
+    if (isUpdated === 0) {
+      console.log("first");
+      deleteFile(file.path);
+      console.log("second");
+      return res.sendStatus(404);
+    }
 
     res.sendStatus(204);
   } catch (error) {

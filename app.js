@@ -18,6 +18,7 @@ app.get("/", (req, res) => {
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use("/public", express.static("public"));
 
 app.use("/api/auth/", authApi);
 app.use("/api/user/", userApi);
