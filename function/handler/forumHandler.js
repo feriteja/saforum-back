@@ -30,22 +30,23 @@ const getAllForums = async (category) => {
 const getForumDetail = async (forumID) => {
   try {
     const forum = await pool.query(
-      `SELECT *, (SELECT   JSON_AGG(
-              JSON_BUILD_OBJECT('id', e.cmt->>'id',
-                                'user',e.cmt->>'user',
-                                'username', u.username,
-                                'avatar', u.avatar,
-                                'alias', u.alias,
-                                'comment', e.cmt->>'comment',
-                                'created_at', e.cmt->>'created_at'
-                               )
-          ) AS comment
-          FROM forum f
-          INNER JOIN LATERAL JSONB_ARRAY_ELEMENTS(f.comment) AS e(cmt) ON TRUE
-          INNER JOIN users u ON (cmt->>'user')::text = u.uuid::text
-          WHERE fuid = '${forumID}')
-      FROM forum
-      WHERE fuid = '${forumID}'`
+      `SELECT forum.*, users.username, users.alias, (SELECT   JSON_AGG(
+        JSON_BUILD_OBJECT('id', e.cmt->>'id',
+                          'user',e.cmt->>'user',
+                          'username', u.username,
+                          'avatar', u.avatar,
+                          'alias', u.alias,
+                          'comment', e.cmt->>'comment',
+                          'created_at', e.cmt->>'created_at'
+                         )
+    ) AS comment
+    FROM forum f
+    INNER JOIN LATERAL JSONB_ARRAY_ELEMENTS(f.comment) AS e(cmt) ON TRUE
+    INNER JOIN users u ON (cmt->>'user')::text = u.uuid::text
+    WHERE fuid = '${forumID}')
+FROM forum
+INNER JOIN users ON  forum.owner =users.uuid
+WHERE fuid = '${forumID}'`
     );
 
     return forum.rows[0];
