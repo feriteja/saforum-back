@@ -34,7 +34,6 @@ router.get("/s/:forumID", async (req, res) => {
     const forumID = req.params.forumID;
 
     const forum = await getForumDetail(forumID);
-    console.log(forum);
 
     return res.status(200).json({ message: "success", data: forum });
   } catch (error) {
@@ -103,28 +102,37 @@ router.delete(
   userLog
 );
 
-router.put("/update", verifyUser, async (req, res, next) => {
-  try {
-    const data = req.body;
+router.put(
+  "/update",
+  upload.single("banner"),
+  verifyUser,
+  async (req, res, next) => {
+    try {
+      const file = req.file;
+      const data = req.body;
 
-    const isUpdate = await updateForum(data);
+      data.banner = file && file.filename;
+      console.log(data);
 
-    if (isUpdate === 0) return res.sendStatus(410);
+      const isUpdate = await updateForum(data.forumID, data);
 
-    res.status(200).json({ message: "forum update success" });
-    req.activity = "update forum";
-    req.status = "success";
-    req.target = data.forumID;
-    next();
-  } catch (error) {
-    res.status(400).json({ message: "failed to update forum" });
-    req.activity = "update forum";
-    req.status = "failed";
-    req.target = data.forumID;
-    next();
-    throw error;
+      if (isUpdate === 0) return res.sendStatus(410);
+
+      res.status(200).json({ message: "forum update success" });
+      req.activity = "update forum";
+      req.status = "success";
+      req.target = data.forumID;
+      next();
+    } catch (error) {
+      res.status(400).json({ message: "failed to update forum" });
+      req.activity = "update forum";
+      req.status = "failed";
+      req.target = req.body.forumID;
+      next();
+      throw error;
+    }
   }
-});
+);
 
 router.patch(
   "/comment",
@@ -136,7 +144,6 @@ router.patch(
 
       const user = req.user.uuid;
       const comment = body.comment.replace(/'/g, ` `);
-      console.log(comment);
 
       const data = JSON.stringify({
         id: user.slice(0, 8) + date.toLocaleTimeString() + comment.slice(2, 3),

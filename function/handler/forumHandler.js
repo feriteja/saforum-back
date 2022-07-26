@@ -81,15 +81,25 @@ const deleteForum = async (forumID) => {
   }
 };
 
-const updateForum = async (data) => {
+const updateForum = async (forumID, data) => {
   try {
-    const res = await pool.query(
-      `UPDATE forum SET title='${data.title}', content='${data.content}'   WHERE fuid = '${data.forumID}' `
+    console.log(forumID);
+    const title = data?.title?.replace(/'/g, "''");
+    const content = data?.content?.replace(/'/g, "''");
+
+    const forumQuery = await pool.query(
+      `SELECT * FROM forum WHERE fuid = '${data.forumID}'`
     );
-    console.log(res);
+    if (forumQuery.rowCount === 0) return forumQuery.rowCount;
+    const forum = forumQuery.rows[0];
+
+    const res = await pool.query(
+      `UPDATE forum SET title='${title || forum.title}', content='${
+        content || forum.content
+      }', banner='${data.banner}'   WHERE fuid = '${data.forumID}' `
+    );
     return res.rowCount;
   } catch (error) {
-    console.log("error update", error);
     throw error;
   }
 };
