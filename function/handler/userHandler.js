@@ -14,7 +14,7 @@ const getUserDetailByUid = async (userID) => {
 const getUserDetailByUsername = async (username) => {
   try {
     const user = await pool.query(
-      `SELECT * FROM users WHERE username = '${username}'`
+      `SELECT users.*  FROM users WHERE username = '${username}'`
     );
 
     return user.rows[0];
@@ -25,6 +25,8 @@ const getUserDetailByUsername = async (username) => {
 
 const updateUser = async (userID, data) => {
   try {
+    const status = data?.status?.replace(/'/g, "''");
+    const alias = data?.alias?.replace(/'/g, "''");
     const userQuery = await pool.query(
       `SELECT * FROM users WHERE uuid = '${userID}'`
     );
@@ -33,8 +35,8 @@ const updateUser = async (userID, data) => {
 
     const res = await pool.query(
       `UPDATE users SET avatar='${data.avatar || user.avatar}', alias='${
-        data.alias || user.alias
-      }', status='${data.status || user.status}' WHERE uuid='${userID}' `
+        alias || user.alias
+      }', status='${status || user.status}' WHERE uuid='${userID}' `
     );
 
     return res.rowCount;
@@ -55,9 +57,23 @@ const getAllUser = async () => {
   }
 };
 
+const getUserForum = async (username) => {
+  try {
+    const forum = await pool.query(`
+    SELECT forum.*, jsonb_array_length(comment) AS comment, users.username as owner
+    FROM forum 
+    INNER JOIN users ON users.uuid = forum.owner
+    WHERE username = '${username}' 
+    ORDER BY forum.created_at DESC
+    `);
+    return forum.rows;
+  } catch (error) {}
+};
+
 module.exports = {
   getUserDetailByUid,
   updateUser,
   getAllUser,
   getUserDetailByUsername,
+  getUserForum,
 };

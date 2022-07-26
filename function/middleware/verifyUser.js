@@ -24,8 +24,11 @@ const verifyUser = async (req, res, next) => {
     req.user = user;
 
     next();
+
+    return;
   } catch (error) {
     res.sendStatus(401);
+    throw error;
   }
 };
 
@@ -35,6 +38,7 @@ const verifyAdmin = async (req, res, next) => {
     if (!isAdmin) return res.status(401).json({ message: "you are not admin" });
     next();
   } catch (error) {
+    res.sendStatus(400);
     throw error;
   }
 };
