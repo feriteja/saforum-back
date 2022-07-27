@@ -26,6 +26,7 @@ router.post(
       );
 
       res.status(201).json({ message: "user has been registered", token });
+
       req.activity = "signup";
       req.status = "success";
       next();

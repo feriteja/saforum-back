@@ -1,5 +1,6 @@
 const { json } = require("express");
 const express = require("express");
+const pool = require("../../db.config");
 const {
   addForum,
   deleteForum,
@@ -7,6 +8,8 @@ const {
   getForumDetail,
   updateForum,
   commentForum,
+  addLikeToForum,
+  removeLikeToForum,
 } = require("../../function/handler/forumHandler");
 const { upload } = require("../../function/middleware/multer");
 const { userLog } = require("../../function/middleware/userLog");
@@ -14,9 +17,9 @@ const { userLog } = require("../../function/middleware/userLog");
 const { verifyUser } = require("../../function/middleware/verifyUser");
 const router = express.Router();
 
-router.get("/:category", async (req, res) => {
+router.get("/", async (req, res) => {
   try {
-    const category = req.params.category;
+    const { category } = req.query;
 
     const forums = await getAllForums(category);
 
@@ -29,6 +32,11 @@ router.get("/:category", async (req, res) => {
   }
 });
 
+router.get("/popular", async (req, res) => {
+  try {
+  } catch (error) {}
+});
+
 router.get("/s/:forumID", async (req, res) => {
   try {
     const forumID = req.params.forumID;
@@ -38,6 +46,59 @@ router.get("/s/:forumID", async (req, res) => {
     return res.status(200).json({ message: "success", data: forum });
   } catch (error) {
     res.sendStatus(404);
+  }
+});
+
+router.post("/like", verifyUser, async (req, res, next) => {
+  try {
+    const { forumID } = req.body;
+    const { uuid: userID } = req.user;
+    const isLike = await addLikeToForum(forumID, userID);
+    if (isLike === 0) {
+      req.activity = "like forum";
+      req.status = "failed";
+      req.target = forumID;
+      res.sendStatus(400);
+      next();
+      return;
+    }
+    req.activity = "like forum";
+    req.status = "success";
+    req.target = forumID;
+    res.sendStatus(204);
+    next();
+  } catch (error) {
+    req.activity = "like forum";
+    req.status = "failed";
+    req.target = req.body.forumID;
+    res.sendStatus(400);
+    throw error;
+  }
+});
+router.post("/nolike", verifyUser, async (req, res, next) => {
+  try {
+    const { forumID } = req.body;
+    const { uuid: userID } = req.user;
+    const isLike = await removeLikeToForum(forumID, userID);
+    if (isLike === 0) {
+      req.activity = "remove like forum";
+      req.status = "failed";
+      req.target = forumID;
+      res.sendStatus(400);
+      next();
+      return;
+    }
+    req.activity = "like forum";
+    req.status = "success";
+    req.target = forumID;
+    res.sendStatus(204);
+    next();
+  } catch (error) {
+    req.activity = "like forum";
+    req.status = "failed";
+    req.target = req.body.forumID;
+    res.sendStatus(400);
+    throw error;
   }
 });
 

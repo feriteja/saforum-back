@@ -81,6 +81,18 @@ const getUserForumNumber = async () => {
   } catch (error) {}
 };
 
+//! ADMIN ONLY
+const getAppLog = async () => {
+  try {
+    const res = await pool.query(`
+    SELECT a.*, u.role 
+    FROM application_log  a
+    LEFT JOIN users u 
+    ON u.username = a.username `);
+    return res.rows;
+  } catch (error) {}
+};
+
 //! SUPER_ADMIN ONLY
 const changeUserRole = async (uuid, role) => {
   try {
@@ -99,4 +111,5 @@ module.exports = {
   getUserForum,
   changeUserRole,
   getUserForumNumber,
+  getAppLog,
 };

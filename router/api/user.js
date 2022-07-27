@@ -7,6 +7,7 @@ const {
   getUserForum,
   changeUserRole,
   getUserForumNumber,
+  getAppLog,
 } = require("../../function/handler/userHandler");
 const { upload } = require("../../function/middleware/multer");
 const {
@@ -68,6 +69,16 @@ router.get("/userforum", verifyUser, verifyAdmin, async (req, res) => {
     return res.status(200).json({ message: "success", data: numberUserNForum });
   } catch (error) {
     res.sendStatus(400);
+    throw error;
+  }
+});
+
+router.get("/applog", verifyUser, verifyAdmin, async (req, res) => {
+  try {
+    const log = await getAppLog();
+
+    return res.status(200).json({ message: "success", data: log });
+  } catch (error) {
     throw error;
   }
 });

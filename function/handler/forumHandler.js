@@ -4,23 +4,34 @@ const getAllForums = async (category) => {
   try {
     if (category === "undefined" || category === undefined) {
       const forum = await pool.query(
-        `SELECT fuid, title, content, banner,  users.username AS owner, forum.created_at, category, like_count, jsonb_array_length(comment) AS comment
-    FROM users
-    JOIN forum ON  forum.owner=users.uuid 
-    ORDER BY forum.created_at DESC`
+        `
+        SELECT fuid, title, banner, content, users.username AS owner, forum.like_by, forum.created_at, category, jsonb_array_length(comment) AS comment
+                FROM users
+                JOIN forum ON  forum.owner=users.uuid
+                ORDER BY forum.created_at DESC`
       );
       return forum.rows;
     }
 
     const forum = await pool.query(
-      `SELECT fuid, title, banner, content,  users.username AS owner, forum.created_at, category, like_count, jsonb_array_length(comment) AS comment
-        FROM users
-        JOIN forum ON  forum.owner=users.uuid
-        WHERE category = '${category}'
-        ORDER BY forum.created_at DESC
+      `
+      SELECT fuid, title, banner, content,  users.username AS owner,  forum.like_by, forum.created_at, category, jsonb_array_length(comment) AS comment
+              FROM users
+              JOIN forum ON  forum.owner=users.uuid
+              WHERE category = '${category}'
+              ORDER BY forum.created_at DESC
         `
     );
     return forum.rows;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const getForumPopular = async () => {
+  try {
+    const res = pool.query(`')
+    `);
   } catch (error) {
     throw error;
   }
@@ -52,6 +63,28 @@ WHERE fuid = '${forumID}'`
     );
 
     return forum.rows[0];
+  } catch (error) {
+    throw error;
+  }
+};
+
+const addLikeToForum = async (forumID, userID) => {
+  try {
+    const res = await pool.query(`UPDATE forum 
+    SET  like_by=like_by || '${userID}'::uuid
+      WHERE fuid = '${forumID}'`);
+    return res.rowCount;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const removeLikeToForum = async (forumID, userID) => {
+  try {
+    const res = await pool.query(`UPDATE forum
+    SET like_by = ARRAY_REMOVE(like_by, '${userID}')
+    where fuid = '${forumID}'`);
+    return res.rowCount;
   } catch (error) {
     throw error;
   }
@@ -123,4 +156,6 @@ module.exports = {
   getForumDetail,
   updateForum,
   commentForum,
+  addLikeToForum,
+  removeLikeToForum,
 };
