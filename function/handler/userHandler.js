@@ -44,19 +44,6 @@ const updateUser = async (userID, data) => {
     throw error;
   }
 };
-
-//! ADMIN ONLY
-const getAllUser = async () => {
-  try {
-    const users = await pool.query(
-      `SELECT uuid, username, role, alias,avatar, created_at FROM users`
-    );
-    return users.rows;
-  } catch (error) {
-    throw error;
-  }
-};
-
 const getUserForum = async (username) => {
   try {
     const forum = await pool.query(`
@@ -70,10 +57,46 @@ const getUserForum = async (username) => {
   } catch (error) {}
 };
 
+//! ADMIN ONLY
+const getAllUser = async (username = "") => {
+  try {
+    const users = await pool.query(
+      `SELECT uuid, username, role, alias,avatar, created_at FROM users WHERE username LIKE '%${username}%' `
+    );
+    return users.rows;
+  } catch (error) {
+    throw error;
+  }
+};
+
+//! ADMIN ONLY
+const getUserForumNumber = async () => {
+  try {
+    const res = await pool.query(`SELECT COUNT(DISTINCT f.fuid) as "forumCount",
+    COUNT(DISTINCT u.uuid) as "usersCount"
+    FROM forum f
+    join users u on true ;
+    `);
+    return res.rows[0];
+  } catch (error) {}
+};
+
+//! SUPER_ADMIN ONLY
+const changeUserRole = async (uuid, role) => {
+  try {
+    const change = await pool.query(
+      `UPDATE users SET role ='${role}'  WHERE uuid = '${uuid}' `
+    );
+    return change.rowCount;
+  } catch (error) {}
+};
+
 module.exports = {
   getUserDetailByUid,
   updateUser,
   getAllUser,
   getUserDetailByUsername,
   getUserForum,
+  changeUserRole,
+  getUserForumNumber,
 };

@@ -4,7 +4,6 @@ const checkFolder = (username) => {
   const dirPath = `./public/user/${username}`;
   const isFolderExist = fs.existsSync(dirPath);
   if (!isFolderExist) {
-    console.log("Creating folder");
     fs.mkdirSync(dirPath);
   }
 };

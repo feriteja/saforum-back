@@ -78,6 +78,7 @@ router.delete(
   verifyUser,
   async (req, res, next) => {
     try {
+      console.log("masuk");
       const forumID = req.body.forumID;
 
       const isDeleted = await deleteForum(forumID);
@@ -109,10 +110,10 @@ router.put(
   async (req, res, next) => {
     try {
       const file = req.file;
+
       const data = req.body;
 
       data.banner = file && file.filename;
-      console.log(data);
 
       const isUpdate = await updateForum(data.forumID, data);
 

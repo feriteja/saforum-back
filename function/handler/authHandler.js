@@ -41,7 +41,6 @@ const signInUser = async (username, password) => {
 
     return user.rows[0];
   } catch (error) {
-    console.log("error", error);
     throw error;
   }
 };
@@ -56,7 +55,6 @@ const signOutUser = async (username) => {
 
     return res;
   } catch (error) {
-    console.log("errorsignout", error);
     throw error;
   }
 };

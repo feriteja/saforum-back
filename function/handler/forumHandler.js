@@ -2,7 +2,7 @@ const pool = require("../../db.config");
 
 const getAllForums = async (category) => {
   try {
-    if (category === "undefined") {
+    if (category === "undefined" || category === undefined) {
       const forum = await pool.query(
         `SELECT fuid, title, content, banner,  users.username AS owner, forum.created_at, category, like_count, jsonb_array_length(comment) AS comment
     FROM users
@@ -53,7 +53,6 @@ WHERE fuid = '${forumID}'`
 
     return forum.rows[0];
   } catch (error) {
-    console.log(error);
     throw error;
   }
 };
@@ -83,7 +82,6 @@ const deleteForum = async (forumID) => {
 
 const updateForum = async (forumID, data) => {
   try {
-    console.log(forumID);
     const title = data?.title?.replace(/'/g, "''");
     const content = data?.content?.replace(/'/g, "''");
 
@@ -96,7 +94,9 @@ const updateForum = async (forumID, data) => {
     const res = await pool.query(
       `UPDATE forum SET title='${title || forum.title}', content='${
         content || forum.content
-      }', banner='${data.banner}'   WHERE fuid = '${data.forumID}' `
+      }', banner='${data.banner || forum.banner}'   WHERE fuid = '${
+        data.forumID
+      }' `
     );
     return res.rowCount;
   } catch (error) {
@@ -106,14 +106,12 @@ const updateForum = async (forumID, data) => {
 
 const commentForum = async (data, forumID) => {
   try {
-    console.log("dua");
     const res = await pool.query(
       `UPDATE forum SET comment= COALESCE(comment,'[]'::jsonb)|| '${data}'::jsonb  WHERE fuid = '${forumID}'`
     );
 
     return res.rowCount;
   } catch (error) {
-    console.log("errorasd", error);
     throw error;
   }
 };

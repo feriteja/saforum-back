@@ -5,6 +5,8 @@ const {
   getUserDetailByUid,
   getUserDetailByUsername,
   getUserForum,
+  changeUserRole,
+  getUserForumNumber,
 } = require("../../function/handler/userHandler");
 const { upload } = require("../../function/middleware/multer");
 const {
@@ -20,8 +22,50 @@ const router = express.Router();
 //! ADMIN ONLY get all user
 router.get("/", verifyUser, verifyAdmin, async (req, res) => {
   try {
-    const user = await getAllUser();
+    const username = req.query.username;
+
+    const user = await getAllUser(username);
     res.status(200).json({ message: "success", data: user });
+  } catch (error) {
+    res.sendStatus(400);
+    throw error;
+  }
+});
+
+//! SUPERADMIN ONLY change user role
+router.patch(
+  "/role",
+  verifyUser,
+  verifyAdmin,
+  async (req, res, next) => {
+    try {
+      if (req.user.role !== "superadmin") return res.sendStatus(401);
+
+      const { uuid, role } = req.body;
+      const user = await changeUserRole(uuid, role);
+      if (user === 0) return res.sendStatus(404);
+
+      req.activity = "edit role";
+      req.status = "success";
+      req.target = uuid;
+      res.sendStatus(204);
+      next();
+    } catch (error) {
+      req.activity = "edit role";
+      req.status = "failed";
+      req.target = req.body.uuid;
+      next();
+      throw error;
+    }
+  },
+  userLog
+);
+
+//! ADMIN ONLY get number of users and forum
+router.get("/userforum", verifyUser, verifyAdmin, async (req, res) => {
+  try {
+    const numberUserNForum = await getUserForumNumber();
+    return res.status(200).json({ message: "success", data: numberUserNForum });
   } catch (error) {
     res.sendStatus(400);
     throw error;

@@ -1,14 +1,16 @@
 const jwt = require("jsonwebtoken");
 const pool = require("../../db.config");
 const dotenv = require("dotenv");
+const { getUserDetailByUsername } = require("../handler/userHandler");
 dotenv.config();
 
 const verifyUser = async (req, res, next) => {
   try {
     const authHeader = req.headers["authorization"];
-    const refreshToken = req.body.refresh_token;
+    const refreshToken = req.body?.refresh_token || req.query?.refresh_token;
 
     const token = authHeader && authHeader.split(" ")[1];
+
     if (!token == null) return res.sendStatus(401);
 
     const user = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
@@ -34,7 +36,12 @@ const verifyUser = async (req, res, next) => {
 
 const verifyAdmin = async (req, res, next) => {
   try {
-    const isAdmin = req.user.role === "ADMIN";
+    const user = await getUserDetailByUsername(req.user.username);
+    const { role } = user;
+
+    const isAdmin = role === "admin" || role === "superadmin";
+    req.user.role = role;
+
     if (!isAdmin) return res.status(401).json({ message: "you are not admin" });
     next();
   } catch (error) {
