@@ -29,6 +29,7 @@ const signInUser = async (username, password) => {
     const userCred = await pool.query(
       `SELECT * FROM credential WHERE username = '${username}'`
     );
+    if (userCred.rowCount === 0) return false;
     const isUser = await bcrypt.compare(password, userCred.rows[0].password);
 
     if (!isUser) {

@@ -10,6 +10,8 @@ const {
   commentForum,
   addLikeToForum,
   removeLikeToForum,
+  getForumPopular,
+  getForumSearch,
 } = require("../../function/handler/forumHandler");
 const { upload } = require("../../function/middleware/multer");
 const { userLog } = require("../../function/middleware/userLog");
@@ -32,9 +34,24 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.get("/search", async (req, res) => {
+  try {
+    const { userInput } = req.query;
+    const forum = await getForumSearch(userInput);
+    return res.status(200).json({ message: "success", data: forum });
+  } catch (error) {
+    throw error;
+  }
+});
+
 router.get("/popular", async (req, res) => {
   try {
-  } catch (error) {}
+    const forum = await getForumPopular();
+
+    return res.status(200).json({ message: "success", data: forum });
+  } catch (error) {
+    res.sendStatus(404);
+  }
 });
 
 router.get("/s/:forumID", async (req, res) => {

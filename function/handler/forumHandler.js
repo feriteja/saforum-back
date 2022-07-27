@@ -5,7 +5,8 @@ const getAllForums = async (category) => {
     if (category === "undefined" || category === undefined) {
       const forum = await pool.query(
         `
-        SELECT fuid, title, banner, content, users.username AS owner, forum.like_by, forum.created_at, category, jsonb_array_length(comment) AS comment
+        SELECT fuid, title, banner, content, users.username AS owner, 
+        forum.like_by, forum.created_at, category, jsonb_array_length(comment) AS comment
                 FROM users
                 JOIN forum ON  forum.owner=users.uuid
                 ORDER BY forum.created_at DESC`
@@ -15,7 +16,8 @@ const getAllForums = async (category) => {
 
     const forum = await pool.query(
       `
-      SELECT fuid, title, banner, content,  users.username AS owner,  forum.like_by, forum.created_at, category, jsonb_array_length(comment) AS comment
+      SELECT fuid, title, banner, content,  users.username AS owner,
+      forum.like_by, forum.created_at, category, jsonb_array_length(comment) AS comment
               FROM users
               JOIN forum ON  forum.owner=users.uuid
               WHERE category = '${category}'
@@ -30,8 +32,18 @@ const getAllForums = async (category) => {
 
 const getForumPopular = async () => {
   try {
-    const res = pool.query(`')
+    const res = await pool.query(`
+    SELECT *, jsonb_array_length(comment) as comment,
+    ARRAY_LENGTH(like_by,1) as like ,
+    (coalesce(jsonb_array_length(comment),0)+coalesce(ARRAY_LENGTH(like_by,1),0))/extract(hour from f.created_at)number,
+    extract(hour from f.created_at),
+    users.username AS owner
+    FROM forum f
+    JOIN users ON users.uuid = f.owner
+    ORDER BY number DESC
+    limit 5
     `);
+    return res.rows;
   } catch (error) {
     throw error;
   }
@@ -63,6 +75,22 @@ WHERE fuid = '${forumID}'`
     );
 
     return forum.rows[0];
+  } catch (error) {
+    throw error;
+  }
+};
+
+const getForumSearch = async (title) => {
+  try {
+    const res = await pool.query(
+      `SELECT fuid, title, banner, content, users.username AS owner, 
+      forum.like_by, forum.created_at, category, jsonb_array_length(comment) AS comment
+              FROM users
+              JOIN forum ON  forum.owner=users.uuid
+              WHERE forum.title LIKE '%${title}%'
+              ORDER BY forum.created_at DESC`
+    );
+    return res.rows;
   } catch (error) {
     throw error;
   }
@@ -158,4 +186,6 @@ module.exports = {
   commentForum,
   addLikeToForum,
   removeLikeToForum,
+  getForumPopular,
+  getForumSearch,
 };

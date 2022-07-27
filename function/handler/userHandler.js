@@ -85,10 +85,11 @@ const getUserForumNumber = async () => {
 const getAppLog = async () => {
   try {
     const res = await pool.query(`
-    SELECT a.*, u.role 
+    SELECT a.*, u.role, coalesce(role,'notuser') as role
     FROM application_log  a
     LEFT JOIN users u 
-    ON u.username = a.username `);
+    ON u.username = a.username
+    ORDER BY time desc`);
     return res.rows;
   } catch (error) {}
 };
